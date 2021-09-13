@@ -1,3 +1,23 @@
+## OCC 0.7.3 EFI r001
+### config.plist
+* Added *UEFI > Quirks > ForceOcWriteFlash* (Boolean: *False*)
+* Copy new *UEFI > Drivers* structure from Sample.plist (Path, Enabled, Arguments)
+* Switched *DeviceProperties* to minimal config based on [3xDP](EXTRAS/DeviceProperties/3xDP.plist)
+
+### Kexts
+* Upgraded **AppleALC.kext** from 1.6.3 to 1.6.4
+* Upgraded **Lilu.kext** from 1.5.5 to 1.5.6
+* Upgraded **VirtualSMC.kext** from 1.2.6 to 1.2.7
+* Upgraded **WhateverGreen.kext** from 1.5.2 to 1.5.3
+
+### Drivers
+* Upgraded **AudioDXE.efi**
+* Upgraded **OpenCanopy.efi**
+* Upgraded **OpenRuntime.efi**
+
+### Tools
+* Upgraded all
+
 ## OCC 0.7.2 EFI r002
 ### config.plist
 * Added *UEFI > Drivers* entry for **OpenCanopy.efi**
