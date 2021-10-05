@@ -1,3 +1,12 @@
+## OCC 0.7.4 EFI r001
+
+### Kexts
+* Upgraded **AppleALC.kext** from 1.6.4 to 1.6.5
+* Upgraded **WhateverGreen.kext** from 1.5.3 to 1.5.4
+
+### Tools
+* Upgraded **OpenShell.efi**
+
 ## OCC 0.7.3 EFI r001
 ### config.plist
 * Added *UEFI > Quirks > ForceOcWriteFlash* (Boolean: *False*)
