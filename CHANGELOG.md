@@ -1,3 +1,26 @@
+## OCC 0.7.6 EFI r001
+
+### config.plist
+* Added *Kernel > Add* entry for *FeatureUnlock.kext* (disabled)
+* Added *Booter > Quirks > ResizeAppleGpuBars* (Integer: *-1*)
+* Added *NVRAM > Add > 7C436110-AB2A-4BBB-A880-FE41995C9F82 > boot-args > igfxfw=2*
+* Added *UEFI > Quirks > ResizeGpuBars* (Integer: *-1*)
+* Added *UEFI > Output > ReconnectGraphicsOnConnect* (Boolean: *False*)
+* Added *UEFI > Output > UIScale* (Integer: *0*)
+* Added *UEFI > Quirks > EnableVmx* (Boolean: *False*)
+* Removed *NVRAM > Add > 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14 > UIScale*
+
+### Kexts
+* Added **FeatureUnlock.keyt** 1.0.4
+* Upgraded **AppleALC.kext** from 1.6.5 to 1.6.7
+* Upgraded **Lilu.kext** from 1.5.6 to 1.5.8
+* Upgraded **VirtualSMC.kext** from 1.2.7 to 1.2.8
+* Upgraded **WhateverGreen.kext** from 1.5.4 to 1.5.5
+
+### Drivers
+* Upgraded **HfsPlus.efi**
+* Upgraded **OpenCanopy.efi**
+
 ## OCC 0.7.4 EFI r001
 
 ### Kexts
