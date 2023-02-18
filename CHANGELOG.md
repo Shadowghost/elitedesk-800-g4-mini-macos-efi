@@ -1,4 +1,74 @@
-## OCC 0.7.6 EFI r001
+## OC 0.8.9 EFI r001
+
+### config.plist
+* Changed *ACPI > Quirks > RebaseRegions* from *true* to *false*
+* Changed *ACPI > Quirks > NormalizeHeaders* from *true* to *false*
+* Changed *Booter > Quirks > ProtectUefiServices* from *true* to *false*
+* Changed *Kernel > Quirks > LapicKernelPanic* from *false* to *true*
+* Changed *UEFI > APFS > MinDate* from *0* to *-1* to allow booting all supported versions of macOS
+* Changed *UEFI > APFS > MinVersion* from *0* to *-1* to allow booting all supported versions of macOS
+* Added *ACPI > Add* for **SSDT-PTS.aml**
+* Added *ACPI > Add* for **SSDT-WAK.aml**
+* Added *ACPI > Patch* to rename *_PTS_* to *XPTS* (paired with **SSDT-PTS**)
+* Added *ACPI > Patch* to rename *_WAK* to *XWAK* (paired with **SSDT-WAK**)
+* Added *Kernel > Block > Item n > Strategy* (String: Disable)
+* Added *Kernel > Quirks > CustomPciSerialDevice* (Boolean: *False*)
+* Added *Kernel > Quirks > ForceAquantiaEthernet* (Boolean: *False*)
+* Added *Misc > Boot > HibernateSkipsPicker* (Boolean: *False*)
+* Added *Misc > Debug > LogModules* (String: *)
+* Added *Misc > Serial*
+* Added *Misc > Tools > Item n > FullNvramAccess* (Boolean: *False*)
+* Added *NVRAM > Add > 7C436110-AB2A-4BBB-A880-FE41995C9F82 > ForceDisplayRotationInEFI* (Integer: 0)
+* Added *NVRAM > Delete > 7C436110-AB2A-4BBB-A880-FE41995C9F82 > ForceDisplayRotationInEFI*
+* Added *UEFI > AppleInput > PointerDwellClickTimeout* (Integer: 0)
+* Added *UEFI > AppleInput > PointerDwellDoubleClickTimeout* (Integer: 0)
+* Added *UEFI > AppleInput > PointerDwellRadius* (Integer: 0)
+* Added *UEFI > AppleInput > PointerPollMin* (Integer: 10)
+* Added *UEFI > AppleInput > PointerPollMax* (Integer: 80)
+* Added *UEFI > AppleInput > PointerPollMask* (Integer: -1)
+* Added *UEFI > Audio > AudioOutMask* (Integer: 1)
+* Added *UEFI > Audio > DisconnectHda* (Boolean: *False*)
+* Added *UEFI > Audio > MaximumGain* (Integer: -15)
+* Added *UEFI > Audio > MinimumAssistGain* (Integer: -30)
+* Added *UEFI > Audio > MinimumAudibleGain* (Integer: -55)
+* Added *UEFI > Drivers > Item 3* (ResetNvramEntry.efi)
+* Added *UEFI > Drivers > Item n > LoadEarly* (Boolean: *False*)
+* Added *UEFI > Drivers > ResetNvramEntry.efi > Arguments* (String: --preserve-boot)
+* Removed *Misc > Debug > SerialInit*
+* Removed *Misc > Security > AllowNvramReset*
+* Removed *Misc > Security > AllowToggleSip*
+* Removed *NVRAM > LegacyEnable*
+* Removed *UEFI > Audio > AudioOut*
+* Removed *UEFI > Audio > MinimumVolume*
+* Removed *UEFI > Audio > VolumeAmplifier*
+
+### ACPI
+* Added **SSDT-WAK.aml** to handle potential corrupt Arg0 on wake from sleep (Rehabman's _WAK fix)
+* Updated **SSDT-XOSI.aml** to include Windows 11 (Windows 2021)
+
+### Kexts
+* Upgraded **AppleALC.kext** from 1.6.7 to 1.7.8
+* Upgraded **FeatureUnlock.keyt** from 1.0.4 to 1.1.3
+* Upgraded **Lilu.kext** from 1.5.8 to 1.6.3
+* Upgraded **NVMeFix.kext** from 1.0.9 to 1.1.0
+* Upgraded **VirtualSMC.kext** from 1.2.8 to 1.3.0
+* Upgraded **WhateverGreen.kext** from 1.5.5 to 1.6.3
+
+### Drivers
+* Added **ResetNvramEntry.efi**
+* Upgraded **AudioDxe.efi**
+* Upgraded **HfsPlus.efi**
+* Upgraded **OpenRuntime.efi**
+
+### Tools
+* Upgraded **CleanNvram.efi**
+* Upgraded **ControlMsrE2.efi**
+* Upgraded **OpenShell.efi**
+
+### Resources
+* Upgrade BugSurFlat theme
+
+## OC 0.7.6 EFI r001
 
 ### config.plist
 * Added *Kernel > Add* entry for *FeatureUnlock.kext* (disabled)
@@ -21,7 +91,7 @@
 * Upgraded **HfsPlus.efi**
 * Upgraded **OpenCanopy.efi**
 
-## OCC 0.7.4 EFI r001
+## OC 0.7.4 EFI r001
 
 ### Kexts
 * Upgraded **AppleALC.kext** from 1.6.4 to 1.6.5
@@ -30,7 +100,7 @@
 ### Tools
 * Upgraded **OpenShell.efi**
 
-## OCC 0.7.3 EFI r001
+## OC 0.7.3 EFI r001
 ### config.plist
 * Added *UEFI > Quirks > ForceOcWriteFlash* (Boolean: *False*)
 * Copy new *UEFI > Drivers* structure from Sample.plist (Path, Enabled, Arguments)
@@ -50,7 +120,7 @@
 ### Tools
 * Upgraded all
 
-## OCC 0.7.2 EFI r002
+## OC 0.7.2 EFI r002
 ### config.plist
 * Added *UEFI > Drivers* entry for **OpenCanopy.efi**
 * Changed *UEFI > Audio > PlayChime* from *Auto* to *Disabled*
@@ -65,7 +135,7 @@
 * Added **[OpenCore Binary Data](https://github.com/acidanthera/OcBinaryData)** Resources
 * Added **[BigSurFlat](https://github.com/82ghost82/BigSurFlat)**
 
-## OCC 0.7.2 EFI r001
+## OC 0.7.2 EFI r001
 ### config.plist
 * Added *UEFI > AppleInput > GraphicsInputMirroring* (Boolean: *True*)
 
