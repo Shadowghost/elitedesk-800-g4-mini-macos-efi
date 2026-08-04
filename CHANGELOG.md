@@ -1,3 +1,69 @@
+## OC 1.0.7 EFI r001
+
+Upgrade from OpenCore 0.8.9 to 1.0.7, covering all intermediate releases (0.9.0 - 1.0.7).
+
+### config.plist
+* Added *Booter > Quirks > ClearTaskSwitchBit* (Boolean: *False*)
+* Added *Booter > Quirks > FixupAppleEfiImages* (Boolean: *True*)
+* Added *Kernel > Quirks > DisableIoMapperMapping* (Boolean: *False*)
+* Added *Misc > Boot > InstanceIdentifier* (String: empty)
+* Added *Misc > Serial > Init* (Boolean: *False*)
+* Added *Misc > Serial > Override* (Boolean: *False*)
+* Added *UEFI > Drivers > Item n > Comment* (String: empty)
+* Added *UEFI > Output > ConsoleFont* (String: empty)
+* Added *UEFI > Output > GopBurstMode* (Boolean: *False*)
+* Added *UEFI > Output > InitialMode* (String: *Auto*)
+* Added *UEFI > Output > ReconnectGraphicsOnConnect* (Boolean: *False*)
+* Added *UEFI > Output > UIScale* (Integer: *1*)
+* Added *UEFI > ProtocolOverrides > PciIo* (Boolean: *False*)
+* Added *UEFI > Quirks > EnableVmx* (Boolean: *False*)
+* Added *UEFI > Quirks > ShimRetainProtocol* (Boolean: *False*)
+* Added *UEFI > Unload*
+* Changed *Kernel > Quirks > ThirdPartyDrives* from *false* to *true*
+* Changed *Misc > Security > SecureBootModel* from *Default* to *Disabled* (required to install/upgrade Sonoma 14.4+, Sequoia and Tahoe)
+* Changed *Kernel > Add* entry *IntelMausi.kext* to **IntelMausiEthernet.kext**
+* Changed *Kernel > Add* entry *EFICheckDisabler.kext* to **RestrictEvents.kext**
+* Added *NVRAM > Add > 4D1FDA02-38C7-4A6A-9CC6-4BCCA8B30102 > revpatch* (String: *sbvmm*, paired with **RestrictEvents.kext**, enables OTA updates)
+* Added *NVRAM > Delete > 7C436110-AB2A-4BBB-A880-FE41995C9F82 > csr-active-config* so the configured SIP value is enforced on every boot
+* Moved *NVRAM > Add > 4D1EDE05-38C7-4A6A-9CC6-4BCCA8B38C14 > UIScale* to *UEFI > Output > UIScale* (setting both is rejected by **ocvalidate**)
+* Added *Kernel > Add* entry for **VoodooHDA.kext** (enabled, *MinKernel* 25.0.0), so audio works on every supported macOS without any manual edit: **AppleALC.kext** serves Catalina to Sequoia, **VoodooHDA.kext** serves Tahoe
+* Changed *Kernel > Add* comments on **AppleALC.kext** and **VoodooHDA.kext** to document that version split
+* Changed *Misc > Boot > PickerAttributes* from *17* to *145* to set *OC_ATTR_USE_FLAVOUR_ICON*, so the boot picker uses the theme's per-OS icons (Windows 10, Windows 11, Linux)
+* Fixed stray trailing space in the *Booter > Quirks > ResizeAppleGpuBars* key name (the quirk was never applied before)
+* Fixed stray trailing space in the *Misc > Debug > LogModules* key name
+* Reordered all keys to match *Sample.plist*; validates cleanly against **ocvalidate** 1.0.7
+
+### ACPI
+* **SSDT-PTS.aml**: changed method *_PTS* from *Serialized* to *NotSerialized* (bug fix)
+
+### Kexts
+* Added **RestrictEvents.kext** 1.1.6
+* Added **VoodooHDA.kext** 3.6.5 ([CloverHackyColor](https://github.com/CloverHackyColor/VoodooHDA), GPLv2) for audio under macOS Tahoe, where Apple removed *AppleHDA*. Enabled, but limited to *MinKernel* 25.0.0 so it is never injected on Sequoia or older, where it would compete with *AppleHDAController* for the HDA PCI device. **AppleALC.kext** needs no matching *MaxKernel*: it patches *AppleHDA*, so on Tahoe it is inert and never binds the device VoodooHDA claims. SIP stays fully enabled because OpenCore injects the kext rather than installing it to */Library/Extensions*. Users who restore *AppleHDA* on Tahoe via OCLP should disable **VoodooHDA.kext**
+* Added **IntelMausiEthernet.kext** 3.0.3 (Mieze) - replaces Acidanthera's *IntelMausi.kext*, which does not support Ethernet under macOS Tahoe
+* Removed **EFICheckDisabler.kext** (no longer needed with **RestrictEvents.kext**)
+* Removed **IntelMausi.kext**
+* Upgraded **AppleALC.kext** from 1.7.9 to 1.9.7
+* Upgraded **FeatureUnlock.kext** from 1.1.3 to 1.1.8
+* Upgraded **Lilu.kext** from 1.6.3 to 1.7.2
+* Upgraded **NVMeFix.kext** from 1.1.0 to 1.1.3
+* Upgraded **VirtualSMC.kext** from 1.3.0 to 1.3.7
+* Upgraded **WhateverGreen.kext** from 1.6.4 to 1.7.0
+* Added *usb-port-type* and *usb-port-number* to every port definition in **USBPorts.kext**, **USBPorts-16.kext** and **USBPorts-noHS14.kext** for macOS Tahoe compatibility (one USB map now works for Tahoe and earlier)
+
+### Drivers
+* Upgraded **AudioDxe.efi**, **HfsPlus.efi**, **OpenCanopy.efi**, **OpenRuntime.efi**, **ResetNvramEntry.efi**
+
+### Tools
+* Upgraded **CleanNvram.efi**, **ControlMsrE2.efi**, **OpenShell.efi**
+
+### Resources
+* Updated **[OpenCore Binary Data](https://github.com/acidanthera/OcBinaryData)** (adds *FirmwareSettings* and *NetworkBoot* labels/icons and the *Terminus* console fonts)
+
+### Notes
+* This EFI keeps *NVRAM > Add > csr-active-config* = `<00000000>` (SIP fully enabled), and it stays valid when enabling the bundled **VoodooHDA.kext**, since OpenCore injects it. Only a */Library/Extensions* install (`<01000000>`) or OpenCore Legacy Patcher (`<03080000>`) would need it relaxed.
+* The **BigSurFlat** theme has no *Other.icns*; neither do Acidanthera's own themes, so entries that are neither macOS, Windows nor a tool fall back to the generic *HardDrive* icon. Purely cosmetic.
+* The upstream guide also ships **SSDT-TPM-Off**, **SSDT-MATH** and **SSDT-FWHD**. They are not included here because they depend on device paths in the machine's own DSDT that could not be verified. *SSDT-MATH* and *SSDT-FWHD* are purely cosmetic; *SSDT-TPM-Off* only matters when TPM is enabled in BIOS for Windows 11 dual boot.
+
 ## OC 0.8.9 EFI r001
 
 ### config.plist
