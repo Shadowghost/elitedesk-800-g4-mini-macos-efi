@@ -1,3 +1,54 @@
+## OC 1.0.8 EFI r001
+
+Upgrade from OpenCore 1.0.7 to 1.0.8. The [guide thread](https://www.insanelymac.com/forum/topic/343937-guide-catalina-big-sur-monterey-ventura-sonoma-sequoia-tahoe-on-hp-elitedesk-800-g4g5-mini-the-perfect-macmini81-hackintosh/) was used as reference.
+
+### config.plist
+* Added *UEFI > Drivers > Item n > HideVerbose* (Boolean: *False*)
+* Removed *darkwake=2* from *NVRAM > Add > 7C436110-AB2A-4BBB-A880-FE41995C9F82 > boot-args*
+* Changed *Kernel > Add* entry *VoodooHDA.kext* to **VoodooHDA_BL.kext** (*ExecutablePath* *Contents/MacOS/VoodooHDA_BL*)
+* Changed *Kernel > Add > AppleALC.kext > MaxKernel* from empty to *24.99.99*
+* Added *Kernel > Add* entry for **IntelMausi.kext** (*MaxKernel* 18.99.99) for Ethernet on Mojave
+* Changed *Kernel > Add > IntelMausiEthernet.kext > MinKernel* from *12.0.0* to *19.0.0*, since it requires Catalina or newer
+* Changed *Booter > Patch* sample entry (*macOS to hacOS*, disabled) to an enabled *Skip Board ID check* patch, which lets *boot.efi* start macOS releases that no longer list *Macmini8,1* as supported (Tahoe)
+* Added *ACPI > Add* entries for **SSDT-TPM-Off.aml**, **SSDT-MATH.aml**, **SSDT-FWHD.aml** and **SSDT-Other.aml**
+* Added *ACPI > Patch* *TPM._STA -> TPM.XSTA* (paired with **SSDT-TPM-Off**), *MATH._STA -> MATH.XSTA* (paired with **SSDT-MATH**) and *RTC._CRS -> RTC.XCRS* (paired with **SSDT-AWAC-HPET-RTC**)
+* Changed *ACPI > Patch* *_OSI -> XOSI*, *_WAK -> XWAK* and *_PTS -> XPTS* to only patch table *DSDT* with an exact *Count* (24, 1, 1), and *_PTS -> XPTS* to match *_PTS* with one argument
+* Added *DeviceProperties > Add > pci-aspm-default* = *<02000000>* (ASPM L1) for SATA *Pci(0x17,0x0)*, both NVMe slots *Pci(0x1B,0x0)/Pci(0x0,0x0)* and *Pci(0x1B,0x4)/Pci(0x0,0x0)*, audio *Pci(0x1F,0x3)* and Ethernet *Pci(0x1F,0x6)*; the audio property was also added to every *EXTRAS/DeviceProperties* variant
+* Added *igfxfw=2* to *NVRAM > Add > 7C436110-AB2A-4BBB-A880-FE41995C9F82 > boot-args* (load Apple's GuC firmware for the UHD 630; requires Intel ME enabled)
+* Validates cleanly against **ocvalidate** 1.0.8
+
+### ACPI
+* **SSDT-AWAC-HPET-RTC.aml**: keep the original *RTC* device and only replace its *_CRS* (RTC memory length 0x02) instead of disabling it and adding *RTC0*; *STAS* changed from 2 to 1 accordingly (no functional change)
+* **SSDT-DMAC**, **SSDT-EC**, **SSDT-PMCR**, **SSDT-PPMC**, **SSDT-USBX**, **SSDT-WAK**, **SSDT-XOSI**, **SSDT-XSPI**: removed redundant *Else* branches (functionally identical)
+* Added **SSDT-TPM-Off.aml**: hides the TPM device from macOS; only takes effect when TPM is enabled in BIOS (e.g. for Windows 11 dual boot)
+* Added **SSDT-MATH.aml**: enables the *MATH* (coprocessor) device under macOS (cosmetic)
+* Added **SSDT-FWHD.aml**: adds the firmware hub device *FWHD* under macOS (cosmetic)
+* Added **SSDT-Other.aml**: names the unnamed PCI devices *@14,2* (*SRAM*) and *@12* (*THMC*) under macOS (cosmetic)
+
+### Kexts
+* Replaced **VoodooHDA.kext** 3.6.5 with **VoodooHDA_BL.kext** 3.7.0-alpha (b320ac9). The previous build linked against *IOAudioFamily* and *IOGraphicsFamily*, which OpenCore cannot link against on Tahoe, so it could not be injected there and Tahoe had no audio. The bootloader build embeds *IOAudioFamily* and only needs kernel KPIs and *IOPCIFamily*, so it can be injected with SIP fully enabled. Side effect: Apple's *IOAudioFamily* (and therefore *AppleUSBAudio*) does not load on Tahoe
+* Changed **VoodooHDA_BL.kext** *Info.plist*: *VoodooHDAEnableVolumeChangeFix* = *true* in both personalities (needed for volume control on this machine), and *IONameMatch* = *HDAS*, *HDEF* so matching does not depend on whether the controller has been renamed to *HDEF*
+* Added **IntelMausi.kext** 1.0.8 (Acidanthera) for Ethernet on Mojave, where **IntelMausiEthernet.kext** 3.x does not work. Together with the kernel ranges above this makes the EFI support Mojave 10.14.6
+* Upgraded **AppleALC.kext** from 1.9.7 to 1.9.8
+* Upgraded **IntelMausiEthernet.kext** from 3.0.0 (build 3.0.3) to 3.0.1 (fixes initialisation under Tahoe with AppleVTD enabled)
+* Upgraded **VirtualSMC.kext** from 1.3.7 to 1.3.8
+* Upgraded **WhateverGreen.kext** from 1.7.0 to 1.7.1
+
+### Drivers
+* Upgraded **AudioDxe.efi**, **OpenCanopy.efi**, **OpenRuntime.efi**, **ResetNvramEntry.efi**
+
+### Tools
+* Upgraded **CleanNvram.efi**, **ControlMsrE2.efi**, **OpenShell.efi**
+
+### Resources
+* Updated **[OpenCore Binary Data](https://github.com/acidanthera/OcBinaryData)** (adds *OpticalDrive* icons to the Acidanthera themes, new *ExtHardDrive* icon for *Chardonnay*)
+* Added **[GoldenGate Extended](https://github.com/HJebbour/GoldenGateExt-OpenCore-Theme)** 3.0 as alternative theme (*Resources/Image/Acidanthera/GoldenGateExt*, select with *PickerVariant* *Acidanthera/GoldenGateExt*), completed with the *FirmwareSettings*, *NetworkBoot* and *OpticalDrive* icons from the stock **GoldenGate** theme
+* **BigSurFlat** (default theme) has no upstream changes since January 2022; the bundled copy is identical apart from the existing *Shutdown.icns* -> *ShutDown.icns* rename
+
+### Notes
+* Unchanged, already the latest release: **Lilu.kext** 1.7.2, **FeatureUnlock.kext** 1.1.8, **NVMeFix.kext** 1.1.3, **RestrictEvents.kext** 1.1.6, **HfsPlus.efi**
+* README: documented the boot picker themes and the alternative audio solutions for macOS Tahoe (regular **VoodooHDA.kext**, *HDAUniversal*, *SimpleHDA*, OCLP)
+
 ## OC 1.0.7 EFI r001
 
 Upgrade from OpenCore 0.8.9 to 1.0.7, covering all intermediate releases (0.9.0 - 1.0.7).
@@ -62,7 +113,7 @@ Upgrade from OpenCore 0.8.9 to 1.0.7, covering all intermediate releases (0.9.0 
 ### Notes
 * This EFI keeps *NVRAM > Add > csr-active-config* = `<00000000>` (SIP fully enabled), and it stays valid when enabling the bundled **VoodooHDA.kext**, since OpenCore injects it. Only a */Library/Extensions* install (`<01000000>`) or OpenCore Legacy Patcher (`<03080000>`) would need it relaxed.
 * The **BigSurFlat** theme has no *Other.icns*; neither do Acidanthera's own themes, so entries that are neither macOS, Windows nor a tool fall back to the generic *HardDrive* icon. Purely cosmetic.
-* The upstream guide also ships **SSDT-TPM-Off**, **SSDT-MATH** and **SSDT-FWHD**. They are not included here because they depend on device paths in the machine's own DSDT that could not be verified. *SSDT-MATH* and *SSDT-FWHD* are purely cosmetic; *SSDT-TPM-Off* only matters when TPM is enabled in BIOS for Windows 11 dual boot.
+* **SSDT-TPM-Off**, **SSDT-MATH** and **SSDT-FWHD** are not included, because they depend on device paths in the machine's own DSDT that could not be verified. *SSDT-MATH* and *SSDT-FWHD* are purely cosmetic; *SSDT-TPM-Off* only matters when TPM is enabled in BIOS for Windows 11 dual boot.
 
 ## OC 0.8.9 EFI r001
 

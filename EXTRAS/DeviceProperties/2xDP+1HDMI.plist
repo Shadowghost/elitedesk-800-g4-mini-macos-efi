@@ -20,6 +20,10 @@
 				</data>
 				<key>model</key>
 				<string>Cannon Lake PCH cAVS</string>
+				<key>pci-aspm-default</key>
+				<data>
+				AgAAAA==
+				</data>
 			</dict>
 			<key>PciRoot(0x0)/Pci(0x2,0x0)</key>
 			<dict>
